@@ -4,7 +4,13 @@ const multer = require('multer');
 require('dotenv').config()
 
 var app = express();
-const upload =multer({ dest : './uploads'})
+const storage =multer.diskStorage({
+  destination: './uploads',
+  filename: function(req, file, cb){
+    cb(null, file.originalname);
+  }
+})
+const upload =multer({ storage: storage})
 app.use(cors());
 app.use('/public', express.static(process.cwd() + '/public'));
 
@@ -14,7 +20,12 @@ app.get('/', function (req, res) {
 
 
 app.post('/api/fileanalyse', upload.single('upfile'), (req, res)=>{
-  res.send("ok")
+  console.log(req.file)
+  res.json({
+    name: req.file.filename,
+    type: req.file.mimetype ,
+    size:req.file.size ,
+  })
 })
 
 
